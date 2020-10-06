@@ -965,3 +965,41 @@ write.csv(
 
   <img src="md-images/image-20201006153949117.png" alt="image-20201006153949117" style="zoom:50%;" />
 
+## 05. 데이터의 이해도를 높일 수 있는 그래프
+
+* stem(...): 줄기 잎 그림
+
+  ```R
+  > exdata1
+  # A tibble: 10 x 8
+        ID SEX     AGE AREA   AMT17 Y17_CNT  AMT16
+     <dbl> <chr> <dbl> <chr>  <dbl>   <dbl>  <dbl>
+   1     1 F        50 서울  1.30e6      50 100000
+   2     2 M        40 경기  4.50e5      25 700000
+   3     3 F        28 제주  2.75e5      10  50000
+   4     4 M        50 서울  4.00e5       8 125000
+   5     5 M        27 서울  8.45e5      30 760000
+   6     6 F        23 서울  4.29e4       1 300000
+   7     7 F        56 경기  1.50e5       2 130000
+   8     8 F        47 서울  5.70e5      10 400000
+   9     9 M        20 인천  9.30e5       4 250000
+  10    10 F        38 경기  5.20e5      17 550000
+  # … with 1 more variable: Y16_CNT <dbl>
+  > stem(exdata1$AGE)
+    The decimal point is 1 digit(s) to the right of the |
+    2 | 0378
+    3 | 8
+    4 | 07
+    5 | 006
+  ```
+
+* Hist(): 히스토그램
+
+  ```R
+  > hist(exdata1$AGE)
+  ```
+
+  <img src="md-images/image-20201006154829219.png" alt="image-20201006154829219" style="zoom:50%;" />
+
+*  
+
