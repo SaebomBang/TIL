@@ -30,7 +30,7 @@
 | [두 개 뽑아서 더하기](https://programmers.co.kr/learn/courses/30/lessons/68644?language=java) | [68644](68644.java)   | HashSet           | 월간          |      |
 | [삼각 달팽이](https://programmers.co.kr/learn/courses/30/lessons/68645?language=java) | [68645](./68645.java) | -                 | 월간, dynamic |      |
 | [입국심사](https://programmers.co.kr/learn/courses/30/lessons/43238) | [43238](43238.java)   | -                 | 이진탐색      | Long |
-| []()                                                         | [](.java)             |                   |               |      |
+| [N-Queen](https://programmers.co.kr/learn/courses/30/lessons/12952) | [12952](12952.java)   |                   | back-tracking |      |
 | []()                                                         | [](.java)             |                   |               |      |
 | []()                                                         | [](.java)             |                   |               |      |
 
