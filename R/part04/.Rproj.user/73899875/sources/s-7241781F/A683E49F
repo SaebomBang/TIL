@@ -1,0 +1,25 @@
+{
+    "id": "A683E49F",
+    "path": "~/R/part04/project2.R",
+    "project_path": "project2.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1602221581752.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "32,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1602226210,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1602226210184,
+    "read_only": false,
+    "read_only_alternatives": []
+}

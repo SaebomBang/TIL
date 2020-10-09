@@ -818,7 +818,7 @@ write.csv(
 * Group_by() & summarise() : 그룹별 합계
 
   ```R
-  > smr2 <- shop %>% group_by(NAME) %>% summarise(TOTALAVG=mean(PRICE*QT))
+  > smr2  <- shop %>% group_by(NAME) %>% summarise(TOTALAVG=mean(PRICE*QT))
   > smr3 <- as.data.frame(smr2)
   > smr3
        NAME TOTALAVG
@@ -1001,5 +1001,146 @@ write.csv(
 
   <img src="md-images/image-20201006154829219.png" alt="image-20201006154829219" style="zoom:50%;" />
 
-*  
+
+# ch07. reshape2패키지
+
+## 01. Melt(): 가로로 긴 데이터를 세로로
+
+### melt()
+
+```R
+> install.packages("reshape2")
+> library(reshape2)
+> names(airquality) <- tolower(names(airquality))
+
+# 월별 정렬
+> m_air <- melt(airquality, id.vars = "month")
+m_air
+
+
+```
+
+**정리안됨**
+
+
+
+# ch08. KoNLP 패키지
+
+## 01. KoNLP
+
+```R
+> install.packages("KoNLP")
+> install.packages("wordcloud2")
+```
+
+## 02. 애국가 형태소 분석하기
+
+### 사전 설정 및 한글 처리 과정 알기
+
+```R
+> library(KoNLP)
+> useSystemDic()
+> useSejongDic()
+> useNIADic()
+```
+
+> 텍스트 수집 -> 분해 -> 단어추출 -> 정제 -> 정형 데이터 생성 -> 분석 -> 시각화
+
+### 텍스트 다운로드 및 형태소 분석 실습
+
+```R
+> library(KoNLP)
+> useSystemDic()
+> useSejongDic()
+> useNIADic()
+
+#
+> word_data <- readLines("애국가(가사) 복사본.txt")
+> word_data
+ [1] "(1절)"                                                       
+ [2] "동해물과 백두산이 마르고 닳도록"                             
+ [3] "하느님이 보우하사 우리나라만세"                              
+ [4] "(후렴)무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"
+
+# 명사 추출
+> word_data2 <- sapply(word_data, extractNoun, USE.NAMES = F)
+> word_data2
+[[1]]
+[1] "1"  "절"
+[[2]]
+[1] "동해"   "물"     "백두산" "닳도"   "록"    
+
+
+# 세종 사전에 단어 등록
+> add_words <- c("백두산", "남산", "철갑", "가을", "하늘", "달")
+> buildDictionary(user_dic = data.frame(add_words, rep("ncn", length(add_words))), replace_usr_dic = T)
+
+# 행렬을 벡터로 변환하기
+> undata <- unlist(word_data2)
+> undata
+  [1] "1"        "절"       "동해"     "물"       "백두산"   "닳도"    
+  [7] "록"       "하느님이" "보우"     "하사"     "우리나라" "세"    
+
+# 사용 빈도 확인하기
+> word_table <- table(undata)
+> word_table
+undata
+                1        2        3        4     가슴     가을     강산 
+       4        1        1        1        1        1        1        4 
+공활한데   구름없     기상       길     길이     나라     남산     닳도 
+
+# 필터링하기
+> undata2 <- Filter(function(x){nchar(x) >= 2}, undata)
+> word_table2 <- table(undata2)
+> word_table2
+undata2
+    가슴     가을     강산 공활한데   구름없 
+       1        1        4        1        1 
+
+# 정렬
+> sort(word_table2, decreasing = T)
+undata2
+    대한     강산   무궁화     보전     사람 
+       8        4        4        4        4 
+```
+
+## 03. 애국가 단어로 워드클라우드 만들기
+
+### 다양한 모양으로 워드클라우드 만들기
+
+ ```R
+> library(wordcloud2)
+> wordcloud2(word_table2)
+ ```
+
+<img src="md-images/image-20201008143042194.png" alt="image-20201008143042194" style="zoom:50%;" />
+
+### 배경 등 색상 변경하기
+
+```R
+> wordcloud2(word_table2, color="random-light", backgroundColor = "black")
+```
+
+<img src="md-images/image-20201008143205337.png" alt="image-20201008143205337" style="zoom:50%;" />
+
+### 모양 변경하기
+
+```R
+> wordcloud2(word_table2, fontFamily = "맑은 고딕", size=1.2, color="random-light", backgroundColor = "black", shape="star")
+```
+
+<img src="md-images/image-20201008143401543.png" alt="image-20201008143401543" style="zoom:50%;" />
+
+# ch00. JAVA with R
+
+## 연동
+
+```R
+> install.packages("Runiversal")
+> install.packages("Rserve")
+
+> library(Rserve)
+> Rserve(args="--RS- encoding utf8 --no-save")
+
+```
 
