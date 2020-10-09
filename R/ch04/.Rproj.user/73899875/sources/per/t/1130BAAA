@@ -1,0 +1,25 @@
+{
+    "id": "1130BAAA",
+    "path": "~/R/ch04/ws02.R",
+    "project_path": "ws02.R",
+    "type": "r_source",
+    "hash": "157160408",
+    "contents": "",
+    "dirty": false,
+    "created": 1601884542151.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "5,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1601885642,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1601885642841,
+    "read_only": false,
+    "read_only_alternatives": []
+}
