@@ -181,15 +181,15 @@
 
 
 
-# 05 프래그먼트(Fragment)이해하기
+# ch05 프래그먼트(Fragment)이해하기
 
-## 05-3 액션바(ActionBar)사용하ㅣ
-
-
+## 05-3 액션바(ActionBar)사용하기
 
 
 
-# 07 선택위젯
+
+
+# ch07 선택위젯
 
 ## 리사이클 뷰(RecycleView)
 
@@ -338,5 +338,376 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(personAdaptor);
     }
  
+```
+
+
+
+# ch09  Thread & Handler
+
+## 09-1  핸들러 이해하기
+
+* Main Activit내 이벤트 처리과정은 하나의 프로세스에서 실행됨 -> Bottleneck 발생 가능성 있음.
+* -> Thread
+  * 여러개의 작업이 동시 수행되는 멀티 스레드 방식 사용
+  * 장점: 프로세스 안에서 메모리 리소스 공유하므로 효율적 처리 가능
+  * 단점: 리소스 접근시 데드락(DeadLock) 발생 가능성 있음
+* 시나리오
+  1. 서비스 사용하기
+  2. 스레드 사용하기
+     * Handler사용
+
+## 09-3 Thread로 메시지 전송하기
+
+```java
+public class MainActivity extends AppCompatActivity {
+    TextView textView, textView2;
+
+    KmHandler kmHandler = new KmHandler();
+    RpmHandler rpmHandler = new RpmHandler();
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        textView = findViewById(R.id.textView);
+        textView2 = findViewById(R.id.textView2);
+
+        final KmThread kmThread = new KmThread();
+        kmThread.start();
+
+        RpmThread rpmThread = new RpmThread();
+        rpmThread.start();
+    }
+
+    class KmThread extends Thread {
+        Random rand = new Random();
+
+        @Override
+        public void run() {
+            while (true) {
+                int value = rand.nextInt(200);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Message message = kmHandler.obtainMessage();
+               
+              	Bundle bundle = new Bundle();
+                bundle.putInt("km", value);
+
+                message.setData(bundle);
+                kmHandler.sendMessage(message);
+            }
+        }
+    }
+
+    class KmHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+
+            Bundle bundle = msg.getData();
+            int value = bundle.getInt("km");
+            textView.setText(value + "km");
+        }
+    }
+
+    class RpmThread extends Thread {
+        Random rand = new Random();
+
+        @Override
+        public void run() {
+            while (true) {
+                int value = rand.nextInt(5000);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Message message = rpmHandler.obtainMessage();
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("rpm", value);
+
+                message.setData(bundle);
+
+                rpmHandler.sendMessage(message);
+            }
+
+        }
+    }
+
+    class RpmHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+
+            Bundle bundle = msg.getData();
+            int value = bundle.getInt("rpm");
+            textView2.setText(value + "rpm");
+        }
+    }
+}
+```
+
+ 
+
+## 09-4 AsyncTask
+
+```java
+public class MainActivity extends AppCompatActivity {
+    Button button, button2;
+    SeekBar seekBar;
+    TextView textView;
+    ImageView imageView;
+
+    MyAsynch myAsynch;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        button = findViewById(R.id.button);
+        button2 = findViewById(R.id.button2);
+
+        seekBar = findViewById(R.id.seekBar);
+        textView = findViewById(R.id.textView);
+        imageView = findViewById(R.id.imageView);
+
+        button2.setEnabled(false);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myAsynch = new MyAsynch();
+                myAsynch.execute();
+            }
+        });
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myAsynch.cancel(true);
+                myAsynch.onCancelled();
+            }
+        });
+    }
+
+
+    class MyAsynch extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected void onPreExecute() {
+            button.setEnabled(false);
+            button2.setEnabled(true);
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+            int sum = 0;
+            for (int i = 1; i <= 100; i++) {
+                if (isCancelled() == true)
+                    break;
+
+                sum += i;
+                publishProgress(i);             //값을 넘
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            int i = values[0].intValue();
+            if (i <= 30) {
+                imageView.setImageResource(R.drawable.down);
+            } else if (i <= 70) {
+                imageView.setImageResource(R.drawable.medium);
+            } else if (i <= 100) {
+                imageView.setImageResource(R.drawable.up);
+            }
+
+            seekBar.setProgress(i);
+            textView.setText("Doing");
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            //백그라운드 작업이 끝난 후
+            textView.setText(s);
+
+            button.setEnabled(true);
+            button2.setEnabled(false);
+        }
+
+        @Override
+        protected void onCancelled() {
+            seekBar.setProgress(0);
+            textView.setText("stopped");
+            imageView.setImageResource(R.drawable.ic_launcher_background);
+
+            button.setEnabled(true);
+            button2.setEnabled(false);
+        }
+    }
+}
+```
+
+
+
+# ch10 서버에 데이터 요청하고 응답받기
+
+## 10-1 네트워킹(Networking)이란
+
+```java
+package com.example.ch10_1_networking;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class HttpConnect {
+    public static String getString(String urlstr) {
+        String result = null;
+        URL url = null;
+        HttpURLConnection hcon = null;
+        InputStream is = null;
+        try {
+            url = new URL(urlstr);
+            hcon = (HttpURLConnection) url.openConnection();
+            hcon.setConnectTimeout(2000);
+            hcon.setRequestMethod("GET");
+            is = new BufferedInputStream(hcon.getInputStream());
+            result = convertStr(is);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static String convertStr(InputStream is) {
+        String result = null;
+        BufferedReader bi = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            bi = new BufferedReader(
+                    new InputStreamReader(is)
+            );
+            String temp = "";
+            while ((temp = bi.readLine()) != null) {
+                sb.append(temp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+}
+```
+
+```java
+public class MainActivity extends AppCompatActivity {
+    EditText editTextId, editTextPwd;
+    Button button;
+    HttpAsync httpAsync;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        editTextId = findViewById(R.id.editTextId);
+        editTextPwd = findViewById(R.id.editTextPwd);
+
+        button = findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onButtonClick();
+            }
+        });
+
+    }
+
+    public void onButtonClick() {
+        String id = editTextId.getText().toString();
+        String pwd = editTextPwd.getText().toString();
+
+        String url = "http://192.168.0.93:8080/Android/NewFile.jsp?id="+id+"&pwd="+pwd;
+
+        httpAsync = new HttpAsync();
+        httpAsync.execute(url);
+    }
+
+    class HttpAsync extends AsyncTask<String, String, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setTitle("Login");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String url = strings[0].toString();
+            String result = HttpConnect.getString(url);
+            return result;
+        }
+
+
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            progressDialog.dismiss();
+
+            if(s.equals("1"))
+                showConnected();
+            else if(s.equals("2"))
+                showDisconnected();
+        }
+    }
+
+    public void showConnected(){
+        Intent intent = new Intent(getApplicationContext(), SecondActivity.class);
+        startActivity(intent);
+    }
+
+    public void showDisconnected(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("로그인 실패");
+        builder.setMessage("로그인 실패 ");
+
+        builder.setNeutralButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+}
 ```
 
