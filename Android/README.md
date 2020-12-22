@@ -711,3 +711,80 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
+
+
+# CH14  GoogleMap
+
+* 준비사항
+
+  * Gradle > bundle.gradle 에 추가
+
+    ```gradle
+        ...
+        implementation 'com.google.android.gms:play-services-maps:17.0.0'
+        ...
+    ```
+
+  * manifests
+
+    ```xml
+    <meta-data
+                android:name="com.google.android.geo.API_KEY"
+               android:value="YOURKEY" />
+    ```
+
+    
+
+  * Activity_main.xml
+
+    ```xml
+     <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    ```
+
+  * MainActivity.java
+
+    ```java
+    public class MainActivity extends AppCompatActivity {
+        SupportMapFragment supportMapFragment;
+        GoogleMap gMap;
+    
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+    
+            supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            supportMapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    gMap = googleMap;
+    
+                    LatLng latlng = new LatLng(37.402456, 126.412786);
+                    gMap.addMarker(new MarkerOptions().position(latlng).title("공항"));
+                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,10));
+                }
+            });
+            Button button = findViewById(R.id.button);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onButtonClick();
+                }
+            });
+    
+            Button button2 = findViewById(R.id.button2);
+            button2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onButton2Click();
+                }
+            });
+        }
+    ```
+
+    
+
